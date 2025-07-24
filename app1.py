@@ -1,8 +1,10 @@
+
 import os
 import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
+# ✅ LangChain + Gemini imports
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
@@ -15,21 +17,21 @@ os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 portfolio_url = "https://sridharshinis.netlify.app/"
 
 def scrape_website(url):
-    """Scrape visible text from a webpage"""
+    """Scrape visible text from a webpage."""
     try:
         res = requests.get(url, timeout=10)
         soup = BeautifulSoup(res.text, "html.parser")
         return " ".join(
-            [p.get_text(separator=" ", strip=True) for p in soup.find_all(["p", "h1", "h2", "li"])]
+            [p.get_text(separator=" ", strip=True) for p in soup.find_all(["p", "h1", "h2", "h3", "li"])]
         )
     except Exception as e:
         return f"Error scraping website: {e}"
 
-# ✅ Combine scraped portfolio + short bio
+# ✅ Combine scraped portfolio + your bio
 portfolio_text = scrape_website(portfolio_url)
 bio_text = """
 Sridharshini is a pre-final year engineering student passionate about AI & ML. 
-She builds projects, explores trends, and showcases them in her portfolio.
+She builds projects, explores current trends, and showcases them in her portfolio.
 """
 
 docs = [
@@ -42,8 +44,8 @@ embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 vector_db = FAISS.from_documents(docs, embeddings)
 retriever = vector_db.as_retriever()
 
-# ✅ Chat model
-llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+# ✅ Chat model → using Gemini 1.5 Flash
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.3)
 
 # ✅ Retrieval QA chain
 qa_chain = RetrievalQA.from_chain_type(
@@ -66,7 +68,7 @@ if st.button("Ask"):
                 st.subheader("💡 Answer:")
                 st.write(result["result"])
             except Exception as e:
-                st.error("⚠️ Gemini API Error. Check your key or model.")
+                st.error("⚠️ Gemini API Error. Check your API key or model.")
                 st.code(str(e))
     else:
         st.warning("Please enter a question!")
