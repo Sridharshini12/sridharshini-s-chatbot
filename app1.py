@@ -8,10 +8,10 @@ from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI # type: ignore
 from langchain.chains import RetrievalQA
 from langchain.docstore.document import Document
-
+git
 # ✅ Set your Gemini API key
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCvWiNdqYt-Du45TQT9W4RRInPx2lCv6LQ"  
+os.environ["GOOGLE_API_KEY"] =t.secrets["GOOGLE_API_KEY"]   
 
 # ✅ Your Netlify website link
 website_url = "https://sridharshinis.netlify.app/"
